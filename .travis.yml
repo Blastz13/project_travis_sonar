@@ -1,27 +1,20 @@
-language: python
-python:
-  - "3.10"  # Версия Python для анализа (SonarCloud требует 3.8+)
+language: node_js
+node_js:
+  - "stable"
+notifications:
+  email: false
 
-# Кэширование для ускорения сборки
 cache:
-  pip: true
   directories:
-    - $HOME/.cache/pip
-
-install:
-  # Установка зависимостей для тестирования
-  - pip install -r requirements.txt
-  # Установка утилиты для запуска SonarScanner
-  - pip install pysonar-scanner
+  - node_modules
 
 script:
-  # Запуск тестов с генерацией отчета о покрытии в формате XML
-  - pytest --cov=./ --cov-report=xml:coverage.xml tests/
-  # Запуск анализатора SonarCloud с передачей параметров
-  - pysonar-scanner -Dsonar.projectKey=$SONAR_PROJECT_KEY \
-                    -Dsonar.organization=$SONAR_ORG_KEY \
-                    -Dsonar.sources=. \
-                    -Dsonar.host.url=https://sonarcloud.io \
-                    -Dsonar.python.coverage.reportPaths=coverage.xml
+  npm run build
 
-# После успешной сборки результаты будут доступны на SonarCloud
+deploy:
+  provider: pages
+  skip_cleanup: true
+  github-token: $GITHUB_TOKEN
+  local_dir: build
+  on:
+    branch: master
